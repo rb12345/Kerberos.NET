@@ -277,24 +277,10 @@ namespace Kerberos.NET.Entities
         {
             var nameSplit = principal.Split('@').ToList();
 
-            if (!string.IsNullOrWhiteSpace(realm) && nameSplit.Count == 1)
-            {
-                nameSplit.Add(realm);
-            }
-
-            if (type == PrincipalNameType.NT_SRV_INST)
-            {
-                return new KrbPrincipalName
-                {
-                    Type = type,
-                    Name = nameSplit.ToArray()
-                };
-            }
-
             return new KrbPrincipalName
             {
-                Type = type,
-                Name = new[] { MakeFullName(nameSplit, PrincipalNameType.NT_PRINCIPAL) }
+                Type = PrincipalNameType.NT_PRINCIPAL,
+                Name = nameSplit[0].Split('/')
             };
         }
 
