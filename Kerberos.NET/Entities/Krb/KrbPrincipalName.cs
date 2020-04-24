@@ -258,13 +258,6 @@ namespace Kerberos.NET.Entities
 
                 name.AddRange(nameSplit.Name);
             }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(realm))
-                {
-                    name.Add(realm);
-                }
-            }
 
             return new KrbPrincipalName
             {
