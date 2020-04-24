@@ -31,7 +31,7 @@ namespace Kerberos.NET.Entities
             out KrbEncryptionKey sessionKey
         )
         {
-            var sname = rst.ServicePrincipalName.Split('/', '@');
+            var sname = rst.ServicePrincipalName.Split('@')[0].Split('/');
             var tgt = kdcRep.Ticket;
 
             var additionalTickets = new List<KrbTicket>();
