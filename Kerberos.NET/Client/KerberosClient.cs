@@ -631,11 +631,28 @@ namespace Kerberos.NET.Client
 
             var asRep = await transport.SendMessage<KrbAsRep>(credential.Domain, asReq);
 
-            var decrypted = credential.DecryptKdcRep(
-                asRep,
-                KeyUsage.EncAsRepPart,
-                d => KrbEncAsRepPart.DecodeApplication(d)
-            );
+            // Attempt to decrypt EncAsRepPart.  If this fails, try decoding as
+            // an EncTgsRepPart, since MIT Kerberos and some other
+            // implementations use this type for backwards compatibility.
+            KrbEncKdcRepPart decrypted = null;
+            try
+            {
+                logger.LogTrace("Attempting to decrypt AS_REP enc-part as EncAsRepPart");
+                decrypted = credential.DecryptKdcRep(
+                    asRep,
+                    KeyUsage.EncAsRepPart,
+                    d => KrbEncAsRepPart.DecodeApplication(d)
+                );
+            }
+            catch (System.Security.Cryptography.CryptographicException ex)
+            {
+                logger.LogTrace("Failed to decrypt AS_REP enc-part as EncAsRepPart, trying as EncTgsRepPart");
+                decrypted = credential.DecryptKdcRep(
+                    asRep,
+                    KeyUsage.EncAsRepPart,
+                    d => KrbEncTgsRepPart.DecodeApplication(d)
+                );
+            }
 
             VerifyNonces(asReqMessage.Body.Nonce, decrypted.Nonce);
 
