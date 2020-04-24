@@ -599,6 +599,10 @@ namespace Kerberos.NET.Client
 
         private async Task CacheTgt(KrbKdcRep kdcRep, KrbEncKdcRepPart encKdcRepPart)
         {
+            // Force SName type to NT_SRV_INST to support TGTs from MIT Kerberos
+            // TODO: Handle this better...
+            kdcRep.Ticket.SName.Type = PrincipalNameType.NT_SRV_INST;
+
             var key = kdcRep.Ticket.SName.FullyQualifiedName;
 
             encKdcRepPart.Key.Usage = KeyUsage.EncTgsRepPartSessionKey;
